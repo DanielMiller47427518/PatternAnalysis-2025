@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import os
 from torch.utils.data import Dataset, DataLoader
-from utils import load_data_2D, BATCH_SIZE
+from utils import load_data_2D, BATCH_SIZE, SEG_TRAIN_PATH, IMAGE_TRAIN_PATH
 
 class ImageDataset(Dataset):
     """
@@ -10,8 +10,8 @@ class ImageDataset(Dataset):
     Overrides __len__ and __getitem__ to allow for use with torch.utils.DataLoader
     """
     def __init__(self, image_dir, segmask_dir, transforms, early_stop=False):
-        image_names = [i for i in os.listdir(image_dir)]
-        mask_names = [m for m in os.listdir(segmask_dir)]
+        image_names = [os.path.join(image_dir, i) for i in os.listdir(image_dir)]
+        mask_names = [os.path.join(segmask_dir, m) for m in os.listdir(segmask_dir)]
 
         self.transforms = transforms
 
@@ -43,11 +43,19 @@ class ImageDataset(Dataset):
 
         return (img, msk)
     
-def get_loader(image_dir, mask_dir, transforms, early_stop):
+def get_loader(image_dir, mask_dir, early_stop, transforms=None):
     """
     Takes directory of image slices and corresponding segmentation masks
     and returns a DataLoader, to be used for training and running inference on model
     """
     dataset = ImageDataset(image_dir, mask_dir, transforms=transforms, early_stop=early_stop)
-    loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6)
+    loader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
     return loader
+
+if __name__ == "__main__":
+
+
+
+    loader = get_loader(IMAGE_TRAIN_PATH, SEG_TRAIN_PATH, early_stop=False)
+
+    print(len(loader))

@@ -1,11 +1,21 @@
 import nibabel as nib
 import numpy as np
 from tqdm import tqdm
-from utils import IMAGE_HEIGHT, IMAGE_WIDTH
 from skimage.transform import resize
+
+SEG_TRAIN_PATH = "hipmri_data/keras_slices_data/keras_slices_seg_train"
+IMAGE_TRAIN_PATH = "hipmri_data/keras_slices_data/keras_slices_train"
+
+SEG_TEST_PATH = "hipmri_data/keras_slices_data/keras_slices_seg_test"
+IMAGE_TEST_PATH = "hipmri_data/keras_slices_data/keras_slices_test"
+
+SEG_VAL_PATH = "hipmri_data/keras_slices_data/keras_slices_seg_validate"
+IMAGE_VAL_PATH = "hipmri_data/keras_slices_data/keras_slices_validate"
+
 BATCH_SIZE = 16
 
-
+IMAGE_HEIGHT = 256
+IMAGE_WIDTH = 128
 
 def to_channels(arr: np.ndarray , dtype = np.uint8) -> np.ndarray:
     channels = np.unique(arr)
@@ -35,7 +45,6 @@ def load_data_2D(imageNames, normImage=False, dtype=np.float32, getAffines=False
     # if len(first_case.shape) == 3:
     #     first_case = first_case [:,:,0] # sometimes extra dims , remove
 
-
     # rows, cols = first_case.shape
     # set size of images based on provided target shape
     images = np.zeros((num, image_shape[0], image_shape[1]) , dtype=dtype)
@@ -51,7 +60,7 @@ def load_data_2D(imageNames, normImage=False, dtype=np.float32, getAffines=False
         inImage = inImage.astype(dtype)
 
         # not all images are correct dimensions, resize
-        inImage = resize(inImage, (image_shape[0], image_shape[1]), order=1, preserve_range=True))
+        inImage = resize(inImage, (image_shape[0], image_shape[1]), order=1, preserve_range=True)
 
         if normImage :
             #~ inImage = inImage / np. linalg . norm ( inImage )
