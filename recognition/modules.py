@@ -1,6 +1,5 @@
 import torch
 import torch.nn as nn
-from torchvision.transforms import v2
 
 class ContextBlock(nn.Module):
     """
