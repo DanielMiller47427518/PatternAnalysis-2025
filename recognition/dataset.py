@@ -43,7 +43,7 @@ class ImageDataset(Dataset):
 
         return (img, msk)
     
-def get_loader(image_dir, mask_dir, early_stop, transforms=None):
+def get_loader(image_dir, mask_dir, early_stop=False, transforms=None):
     """
     Takes directory of image slices and corresponding segmentation masks
     and returns a DataLoader, to be used for training and running inference on model

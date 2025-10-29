@@ -115,17 +115,24 @@ class UNet2D(nn.Module):
         self.us4 = UpsampleBlock(latent_channels * 2, latent_channels)
 
         # SEGMENTATION
-        self.final = nn.Conv2d(latent_channels, latent_channels, kernel_size=3, padding=1)
-        self.segment = nn.Conv2d(latent_channels, num_classes, kernel_size=1)
+        self.final = nn.Conv2d(latent_channels*2, latent_channels*2, kernel_size=3, padding=1)
+        self.segment = nn.Conv2d(latent_channels*2, num_classes, kernel_size=1)
 
     def forward(self, x):
         # ENCODER
         # store each output for encoding for U skip connections
         # convolution layer between each contextblock
         e1 = self.encode1(x)
+
+
         e2 = self.encode2(self.ds1(e1))
+    
+
         e3 = self.encode3(self.ds2(e2))
+
+
         e4 = self.encode4(self.ds3(e3))
+    
         # BOTTLENECK
         x_middle = self.bottle(self.ds4(e4))
         
