@@ -15,7 +15,7 @@ print(torch.__version__)
 
 # model hyperparameters
 learning_rate = 10e-3
-epochs = 5
+epochs = 30
 batch_size = 16
 
 latent_channels = 64
@@ -85,7 +85,7 @@ def train():
             loss.backward()
             optimizer.step()
 
-            print("Batch {}, Loss {:.3f}".format(i, loss.item()))
+            # print("Batch {}, Loss {:.3f}".format(i, loss.item()))
     
         print("Epoch [{}/{}], Loss: {:.5f}"
                     .format(epoch+1, epochs, loss.item()))
@@ -94,6 +94,8 @@ def train():
     elapsed = end - start
     print("Training took " + str(elapsed) + " secs or " + str(elapsed/60) + " mins in total")
     print("Daniel Miller s4742751")
+
+    torch.save(model.state_dict(), "2DUnet_trained.pth")
 
 
 if __name__ == "__main__":
