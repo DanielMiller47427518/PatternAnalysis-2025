@@ -1,0 +1,8 @@
+# python cache
+__pycache__/
+*.pyc
+
+.venv/
+
+# data folder
+hipmri_data/
