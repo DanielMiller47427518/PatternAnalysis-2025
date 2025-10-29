@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from torchvision.transforms import v2
-
+import torch.nn.functional as F
 
 
 
@@ -30,16 +30,27 @@ class contextBlock(nn.Module):
         out = self.act(out)
         return out
 
-    
-
 
 class localisationBlock(nn.Module):
     """
     Localisation module
-    Contains one 3x3x3 convolution, then a 1x1x1 convolution
+    Contains one 3x3x3 convolution, then a 1x1x1 convolution which halves channels
     """
-    pass
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.act = nn.LeakyReLU(10e-2)
 
+        self.localisation = nn.Sequential(
+            nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1, bias=False),
+            nn.InstanceNorm2d(in_channels),
+            self.act,
+            nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
+            nn.InstanceNorm2d(out_channels),
+            self.act
+        )
+
+    def forward(self, x):
+        return self.localisation(x)
 
 class upsampleBlock(nn.Module):
     """
@@ -47,8 +58,17 @@ class upsampleBlock(nn.Module):
     Repeats feature voxels twice in each dimension
     Performs one 3x3x3 convolution
     """
-    pass
-
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.upsample = nn.Sequential(
+            nn.Upsample(scale_factor=2, mode='nearest'),
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            nn.InstanceNorm2d(out_channels),
+            nn.LeakyReLU(10e-2)
+        )
+    
+    def forward(self, x):
+        return self.upsample(x)
 
 class UNet2D(nn.Module):
     """
