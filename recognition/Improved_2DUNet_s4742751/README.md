@@ -3,7 +3,7 @@
 Daniel Miller (s4742751)
 
 ## Task Overview
-The task is to perform segmentation on the HipMRI data found here. The goal is to obtain an average dice score for the Prostate label of at least 0.75 on the test set.
+The task (task 3) is to perform segmentation on the HipMRI data found here. The goal is to obtain an average dice score for the Prostate label of at least 0.75 on the test set.
 The model architecture chosen is based on the Improved UNet architecture by Isensee et al. (2018). This model was chosen as a similar problem involving segmentation
 on brain MRI scans was performed with this architecture, to a high degree of success (mean Dice score of 0.858)
 
@@ -94,4 +94,22 @@ Displayed below are some of the example outputs of running inference on the mode
 
 We can see from the predicted masks that the model is able to very succesfully segment the unseen data. The model is able to capture the larger structures such as the Bladder and 
 Bones very well, as well as preserving the smaller structures, like the prostate.
+
+## Dependencies
+Python: 3/12/4  
+PyTorch: 2.9.0 + CUDA 12.8  
+Numpy: 2.3.4  
+Matplotlib: 3.10.7  
+Nibabel: 5.3.2 
+
+## How to use
+Ensure Data is downloaded, can be found [here](https://data.csiro.au/collection/csiro:51392v2?redirected=true)
+Install all listed dependencies into a virtual environment
+Define paths to data in utils.py (see Directories above)
+To train, run: python train.py
+To get predictions as well as sample outputs run: python predict.py
+Dice score per class is printed to stdout, and images are saved in specified IMAGE_PATH
+
+## References
+1. Isensee, F; et al. "Brain Tumor Segmentation and Radiomics Survival Prediction: Contribution to the BRATS 2017 Challenge" Feb. 2018. Retrieved from https://arxiv.org/abs/1802.10508v1
 
