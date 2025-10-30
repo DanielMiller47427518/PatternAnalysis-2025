@@ -91,9 +91,9 @@ After training the model with the specified hyperparameters for 30 epochs, we ha
 We have that the model was able to successfully achieve a dice score higher than the goal of 0.75, reaching a score of 0.896 on the unseen test data.
 
 Displayed below are some of the example outputs of running inference on the model with the test set, including an image, the ground truth mask, and prediction by the model:  
-[first example](./readme_images/output_1.png)  
-[second example](./readme_images/output_2.png)
-[third example](./readme_images/output_3.png)
+![first example](./readme_images/output_0.png)  
+![second example](./readme_images/output_1.png)
+![third example](./readme_images/output_2.png)
 
 We can see from the predicted masks that the model is able to very succesfully segment the unseen data. The model is able to capture the larger structures such as the Bladder and 
 Bones very well, as well as preserving the smaller structures, like the prostate.
