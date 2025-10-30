@@ -12,7 +12,7 @@ IMAGE_TEST_PATH = "hipmri_data/keras_slices_data/keras_slices_test"
 SEG_VAL_PATH = "hipmri_data/keras_slices_data/keras_slices_seg_validate"
 IMAGE_VAL_PATH = "hipmri_data/keras_slices_data/keras_slices_validate"
 
-MODEL_PATH = "2DUnet_trained.pth"
+MODEL_PATH = "2DUnet_trained_1.pth"
 
 BATCH_SIZE = 16
 IMAGE_HEIGHT = 256
