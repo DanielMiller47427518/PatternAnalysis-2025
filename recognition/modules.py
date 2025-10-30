@@ -94,7 +94,6 @@ class UNet2D(nn.Module):
         self.bottle = ContextBlock(latent_channels * 16, latent_channels * 16)
 
         # DECODING
-
         # each localisation block has concatenated output of corresponding encoding layer
         # therefore latent_channels will be double output of previous upsample block
         self.us1 = UpsampleBlock(latent_channels*16, latent_channels * 8)
@@ -123,16 +122,9 @@ class UNet2D(nn.Module):
         # store each output for encoding for U skip connections
         # convolution layer between each contextblock
         e1 = self.encode1(x)
-
-
         e2 = self.encode2(self.ds1(e1))
-    
-
         e3 = self.encode3(self.ds2(e2))
-
-
         e4 = self.encode4(self.ds3(e3))
-    
         # BOTTLENECK
         x_middle = self.bottle(self.ds4(e4))
         

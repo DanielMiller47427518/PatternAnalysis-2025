@@ -10,8 +10,8 @@ class ImageDataset(Dataset):
     Overrides __len__ and __getitem__ to allow for use with torch.utils.DataLoader
     """
     def __init__(self, image_dir, segmask_dir, transforms, early_stop=False):
-        image_names = [os.path.join(image_dir, i) for i in os.listdir(image_dir)]
-        mask_names = [os.path.join(segmask_dir, m) for m in os.listdir(segmask_dir)]
+        image_names = sorted([os.path.join(image_dir, i) for i in os.listdir(image_dir)])
+        mask_names = sorted([os.path.join(segmask_dir, m) for m in os.listdir(segmask_dir)])
 
         self.transforms = transforms
 
