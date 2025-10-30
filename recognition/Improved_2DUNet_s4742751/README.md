@@ -20,9 +20,6 @@ Segmentation masks contain 6 classes, represented as integers from 0 to 5. The i
 **4** = Rectum  
 **5** = Prostate  
 
-We have below an example image from the dataset along with its corresponding segmentation mask:
-
-
 ## Data Preprocessing
 **Normalisation**: MRI intensity values are non-standardised across different machines, therefore it is critical to normalise the pixel intensities. This also has the added
 benefit of improving model stability for our neural network.  
