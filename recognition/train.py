@@ -7,6 +7,7 @@ from torch.nn.utils import clip_grad_norm_
 from predict import DiceScorePredict
 import torch.nn as nn
 import torch.nn.functional as F
+import matplotlib.pyplot as plt
 import time 
 
 device = torch.device('cuda' if torch.cuda.is_available() else "cpu")
@@ -157,6 +158,30 @@ def validate(model, val_loader, criterion, epoch):
 
         print(f"Validation set loss at epoch: {epoch}/{epochs}: {avg_loss}")
 
+def plot_losses(train_losses, val_losses):
+    """
+    Plots Training loss and validation loss on same set of axes
+
+    Params:
+        train_losses: losses for each epoch on training data
+        val_losses: losses for validation set recorded at each epoch throughout training
+    
+    """
+    plt.figure(figsize=(16,10))
+    epoch_arr = list(range(1, epochs+1))
+
+    plt.plot(epoch_arr, train_losses, label="Training Dice Loss")
+    plt.plot(epoch_arr, val_losses, label="Validation Dice Loss")
+    
+    plt.title("Training and Validation Dice Loss", fontsize=20)
+    plt.grid(True)
+    plt.xlabel("Epoch")
+    plt.ylabel("Dice Loss")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("training_loss_plot.png")
+
+
 if __name__ == "__main__":
     print(device)
   
@@ -165,4 +190,6 @@ if __name__ == "__main__":
 
     print(train_losses)
     print(validation_losses)
+
+    plot_losses(train_losses, validation_losses)
 
