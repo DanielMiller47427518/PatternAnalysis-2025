@@ -10,3 +10,4 @@ hipmri_data/
 
 2DUnet_trained.pth
 *.pth
+*.png

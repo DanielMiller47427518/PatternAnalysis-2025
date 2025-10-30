@@ -1,7 +1,7 @@
 import torch
 from dataset import get_loader
 from modules import UNet2D
-from utils import SEG_TRAIN_PATH, IMAGE_TRAIN_PATH, SEG_TEST_PATH, IMAGE_TEST_PATH, SEG_VAL_PATH, IMAGE_VAL_PATH
+from utils import SEG_TRAIN_PATH, IMAGE_TRAIN_PATH, SEG_TEST_PATH, IMAGE_TEST_PATH, SEG_VAL_PATH, IMAGE_VAL_PATH, class_map
 from torchvision.transforms import v2
 from torch.nn.utils import clip_grad_norm_
 from predict import DiceScorePredict
@@ -23,8 +23,9 @@ weight_decay = 1e-3
 latent_channels = 64
 in_channels = 1
 # add extra weighting for under-represented classes
-class_weights = torch.tensor([0.3, 0.3, 1.0, 1.0, 1.5, 1.5]).to(device) 
-# hipmri data contains 6 classes total
+# class_weights = torch.tensor([0.3, 0.3, 1.0, 1.0, 1.5, 1.5]).to(device) 
+class_weights = torch.tensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]).to(device) 
+# hipmri data contains 6 classes total 
 num_classes = 6
 
 # can use transforms if results do not meet criteria
@@ -135,12 +136,16 @@ def train():
     print("Training took " + str(elapsed) + " secs or " + str(elapsed/60) + " mins in total")
     print("Daniel Miller s4742751")
 
-    torch.save(model.state_dict(), "2DUnet_trained.pth")
+    torch.save(model.state_dict(), "2DUnet_trained_1.pth")
 
 
-def validate(model, val_loader, criterion, epoch):
+def validate(model, val_loader, criterion, epoch, per_class = False):
     model.eval()
     batch_num = 0
+
+    dice_scores = torch.zeros(num_classes, device=device)
+
+
     total_score = 0
     with torch.no_grad():
         for idx, (images, masks) in enumerate(val_loader):
@@ -150,13 +155,26 @@ def validate(model, val_loader, criterion, epoch):
             outputs = model(images)
             score = criterion(outputs, masks)
 
-            total_score += score
+            if per_class:
+                dice_scores += score
+                batch_num += 1
+            else:
+                total_score += score.item()
+        if per_class:
+            dice_per_class = dice_scores / batch_num
+            dice_per_class = dice_per_class.cpu()
 
-        avg_loss = total_score / len(val_loader)
-        validation_losses.append(avg_loss)
+            print("Performance of each class on the test set:")
+            for i, score in enumerate(dice_per_class.cpu()):
+                print(f"{class_map[i]}: {score:.3f}")
 
+            
+        else:
+            avg_loss = total_score / len(val_loader)
+            validation_losses.append(avg_loss)
+            print(f"Validation set loss at epoch: {epoch+1}/{epochs}: {avg_loss}")
 
-        print(f"Validation set loss at epoch: {epoch}/{epochs}: {avg_loss}")
+        
 
 def plot_losses(train_losses, val_losses):
     """
@@ -179,7 +197,7 @@ def plot_losses(train_losses, val_losses):
     plt.ylabel("Dice Loss")
     plt.legend()
     plt.tight_layout()
-    plt.savefig("training_loss_plot.png")
+    plt.savefig("training_loss_plot_1.png")
 
 
 if __name__ == "__main__":
@@ -192,4 +210,7 @@ if __name__ == "__main__":
     print(validation_losses)
 
     plot_losses(train_losses, validation_losses)
+
+    validate(model, validation_loader,DiceScorePredict(), epochs, per_class=True )
+
 

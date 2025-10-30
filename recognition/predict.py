@@ -5,7 +5,7 @@ import torch.nn as nn
 from dataset import get_loader
 from modules import UNet2D
 # from train import DiceLoss
-from utils import MODEL_PATH, SEG_TEST_PATH, IMAGE_TEST_PATH
+from utils import MODEL_PATH, SEG_TEST_PATH, IMAGE_TEST_PATH, class_map
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -77,8 +77,11 @@ def evaluate():
         
 
     print("Performance of each class on the test set:")
+    # for i, score in enumerate(dice_per_class.cpu()):
+    #     print("Class {}: {:.3f}".format(i, score))
+
     for i, score in enumerate(dice_per_class.cpu()):
-        print("Class {}: {:.3f}".format(i, score))
+        print(f"{class_map[i]}: {score:.3f}")
 
 
 if __name__ == "__main__":

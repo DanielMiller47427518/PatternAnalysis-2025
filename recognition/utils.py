@@ -12,12 +12,20 @@ IMAGE_TEST_PATH = "hipmri_data/keras_slices_data/keras_slices_test"
 SEG_VAL_PATH = "hipmri_data/keras_slices_data/keras_slices_seg_validate"
 IMAGE_VAL_PATH = "hipmri_data/keras_slices_data/keras_slices_validate"
 
-MODEL_PATH = "2DUnet_trained_betterer.pth"
+MODEL_PATH = "2DUnet_trained.pth"
 
 BATCH_SIZE = 16
-
 IMAGE_HEIGHT = 256
 IMAGE_WIDTH = 128
+
+class_map = {
+    0: "Background",
+    1: "Body",
+    2: "Bones",
+    3: "Bladder",
+    4: "Rectum",
+    5: "Prostate"
+}
 
 def to_channels(arr: np.ndarray , dtype = np.uint8) -> np.ndarray:
     channels = np.unique(arr)
