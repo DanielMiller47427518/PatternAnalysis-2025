@@ -103,12 +103,12 @@ Matplotlib: 3.10.7
 Nibabel: 5.3.2 
 
 ## How to use
-Ensure Data is downloaded, can be found [here](https://data.csiro.au/collection/csiro:51392v2?redirected=true)
-Install all listed dependencies into a virtual environment
-Define paths to data in utils.py (see Directories above)
-To train, run: python train.py
-To get predictions as well as sample outputs run: python predict.py
-Dice score per class is printed to stdout, and images are saved in specified IMAGE_PATH
+Ensure Data is downloaded, can be found [here](https://data.csiro.au/collection/csiro:51392v2?redirected=true)  
+Install all listed dependencies into a virtual environment  
+Define paths to data in utils.py (see Directories above)  
+To train, run: python train.py  
+To get predictions as well as sample outputs run: python predict.py  
+Dice score per class is printed to stdout, and images are saved in specified IMAGE_PATH  
 
 ## References
 1. Isensee, F; et al. "Brain Tumor Segmentation and Radiomics Survival Prediction: Contribution to the BRATS 2017 Challenge" Feb. 2018. Retrieved from https://arxiv.org/abs/1802.10508v1
