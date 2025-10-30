@@ -66,11 +66,11 @@ The Dice loss function was used as the loss function throughout training. The av
 For validation and testing, a variation of the Dice Loss was used that does not average across classes to allow for the evaluation of the model for each class
 
 ### Hyperparameters
-**Learning Rate**: 1e-4
-**Epochs**: 30
-**Batch Size**: 16
-**Weight Decay**: 1e-3
-**Optimiser**: AdamW
+**Learning Rate**: 1e-4  
+**Epochs**: 30  
+**Batch Size**: 16  
+**Weight Decay**: 1e-3  
+**Optimiser**: AdamW  
 
 ## Training and Validation Loss
 We have a plot for the loss on training set and validation set:  
@@ -88,5 +88,13 @@ segment the other 5 classes to a high degree of accuracy on the validation set.
 After training the model with the specified hyperparameters for 30 epochs, we have the following per-class Dice statistic:  
 ![test results](./readme_images/test_loss.png)
 
-Therefore we have that the model was able to successfully achieve a dice score higher than the goal of 0.75, reaching a score of 0.896 on the unseen test data.
+We have that the model was able to successfully achieve a dice score higher than the goal of 0.75, reaching a score of 0.896 on the unseen test data.
+
+Displayed below are some of the example outputs of running inference on the model with the test set, including an image, the ground truth mask, and prediction by the model:  
+[first example](./readme_images/output_1.png)  
+[second example](./readme_images/output_2.png)
+[third example](./readme_images/output_3.png)
+
+We can see from the predicted masks that the model is able to very succesfully segment the unseen data. The model is able to capture the larger structures such as the Bladder and 
+Bones very well, as well as preserving the smaller structures, like the prostate.
 

@@ -9,7 +9,6 @@ class ContextBlock(nn.Module):
     def __init__(self, in_channels, out_channels, dropout=0.3):
         super().__init__()
         self.act = nn.LeakyReLU(10e-2)
-
         self.context = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
             nn.InstanceNorm2d(out_channels),
@@ -25,7 +24,6 @@ class ContextBlock(nn.Module):
         out += identity
         out = self.act(out)
         return out
-
 
 class LocalisationBlock(nn.Module):
     """

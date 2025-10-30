@@ -1,7 +1,7 @@
 import torch
 from dataset import get_loader
 from modules import UNet2D
-from utils import SEG_TRAIN_PATH, IMAGE_TRAIN_PATH, SEG_TEST_PATH, IMAGE_TEST_PATH, SEG_VAL_PATH, IMAGE_VAL_PATH, class_map
+from utils import SEG_TRAIN_PATH, IMAGE_TRAIN_PATH, SEG_VAL_PATH, IMAGE_VAL_PATH, class_map, MODEL_PATH
 from torchvision.transforms import v2
 from torch.nn.utils import clip_grad_norm_
 from predict import DiceScorePredict
@@ -17,7 +17,6 @@ print(device)
 learning_rate = 1e-4
 epochs = 30
 batch_size = 16
-momentum = 0.9
 weight_decay = 1e-3
 
 latent_channels = 64
@@ -32,13 +31,12 @@ num_classes = 6
 transforms = v2.Compose([
     v2.RandomVerticalFlip(),
     v2.RandomRotation(10)
-]
-)
+])
 
 train_loader = get_loader(IMAGE_TRAIN_PATH, SEG_TRAIN_PATH, transforms=transforms)
-
 validation_loader = get_loader(IMAGE_VAL_PATH, SEG_VAL_PATH)
 
+# initialise model with specified hyperparams
 model = UNet2D(in_channels=in_channels, latent_channels=latent_channels, num_classes=num_classes)
 model = model.to(device)
 
@@ -56,7 +54,6 @@ class DiceLoss(nn.Module):
                 preds: output from model on a given inference
                 targets: ground truth labels for a given input image
         """
-
         # apply the softmax function to the predictions to get class probs
         pred = self.softmax(preds)
         targets = targets.squeeze(1).long()
@@ -72,33 +69,23 @@ class DiceLoss(nn.Module):
         intersection = (pred * target).sum(dim=2)
         dice = (2.0 * intersection + self.smooth) / (pred.sum(dim=2) + target.sum(dim=2) + self.smooth)
         dice = dice.mean(dim=0)
-
-
-
         dice_loss = self.weights * (1 - dice)
-
         return dice_loss.mean()
 
 criterion = DiceLoss(class_weights=class_weights)
 total_step = len(train_loader)
-# optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay)
 optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=weight_decay)
-# scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=50)
 
 # losses for each epoch, used for plot
 train_losses = []
 validation_losses = []
 
-
 def train():
     model.train()
-
     print(" -- Training -- ")
-
     start = time.time()
     for epoch in range(epochs):
         loss_total = 0
-
         for i, (images, masks) in enumerate(train_loader):
             images = images.to(device)
             masks = masks.to(device)
@@ -114,9 +101,7 @@ def train():
             # gradient clip
             clip_grad_norm_(model.parameters(), max_norm=1.0)
 
-
             optimizer.step()
-
             loss_total += loss.item()
         
         # Convert summed loss across all batches to average loss for entire epoch
@@ -126,35 +111,32 @@ def train():
         print("Epoch [{}/{}], Loss: {:.5f}"
                     .format(epoch+1, epochs, epoch_loss))
 
-
         validate(model, validation_loader, criterion, epoch)
 
-        
-        
+
     end = time.time()
     elapsed = end - start
     print("Training took " + str(elapsed) + " secs or " + str(elapsed/60) + " mins in total")
-    print("Daniel Miller s4742751")
-
-    torch.save(model.state_dict(), "2DUnet_trained_1.pth")
-
+    # save trained model to MODEL_PATH location, alter in utils as desired
+    torch.save(model.state_dict(), MODEL_PATH)
 
 def validate(model, val_loader, criterion, epoch, per_class = False):
+    """
+    Runs inference of the model using validation data
+    if per_class is False, uses averaged Dice loss, otherwise uses per class dice loss for summary
+    """
     model.eval()
     batch_num = 0
-
     dice_scores = torch.zeros(num_classes, device=device)
-
-
     total_score = 0
     with torch.no_grad():
         for idx, (images, masks) in enumerate(val_loader):
             images = images.to(device)
             masks = masks.to(device)
-
+            # forward pass
             outputs = model(images)
             score = criterion(outputs, masks)
-
+            # if per class, do not average
             if per_class:
                 dice_scores += score
                 batch_num += 1
@@ -167,14 +149,10 @@ def validate(model, val_loader, criterion, epoch, per_class = False):
             print("Performance of each class on the test set:")
             for i, score in enumerate(dice_per_class.cpu()):
                 print(f"{class_map[i]}: {score:.3f}")
-
-            
         else:
             avg_loss = total_score / len(val_loader)
             validation_losses.append(avg_loss)
             print(f"Validation set loss at epoch: {epoch+1}/{epochs}: {avg_loss}")
-
-        
 
 def plot_losses(train_losses, val_losses):
     """
@@ -183,14 +161,12 @@ def plot_losses(train_losses, val_losses):
     Params:
         train_losses: losses for each epoch on training data
         val_losses: losses for validation set recorded at each epoch throughout training
-    
     """
     plt.figure(figsize=(16,10))
     epoch_arr = list(range(1, epochs+1))
 
     plt.plot(epoch_arr, train_losses, label="Training Dice Loss")
     plt.plot(epoch_arr, val_losses, label="Validation Dice Loss")
-    
     plt.title("Training and Validation Dice Loss", fontsize=20)
     plt.grid(True)
     plt.xlabel("Epoch")
@@ -201,16 +177,12 @@ def plot_losses(train_losses, val_losses):
 
 
 if __name__ == "__main__":
+    # prints device to ensure GPU is being used
     print(device)
-  
-    # GFG
     train()
-
-    print(train_losses)
-    print(validation_losses)
-
+    # plot training loss and validation loss
     plot_losses(train_losses, validation_losses)
-
-    validate(model, validation_loader,DiceScorePredict(), epochs, per_class=True )
+    # validate model after training is complete
+    validate(model, validation_loader, DiceScorePredict(), epochs, per_class=True)
 
 
